@@ -1,32 +1,37 @@
 import { useState } from 'react';
-import { Button, StyleSheet, Text, TextInput, View, ScrollView, FlatList } from 'react-native';
+import { StyleSheet, View, FlatList } from 'react-native';
+import GoalItem from './component/GoalItem';
+import GoalInput from './component/GoalInput';
 
 export default function App() {
-    const [enteredHoalText, setEnteredHoalText] = useState('');
     const [courseGoals, setCourseGoals] = useState([]);
 
-    function goalInputHandler(enteredText) {
-        setEnteredHoalText(enteredText);
+    function addGoalHandler(enteredHoalText) {
+        setCourseGoals((currentCoursGoals) => [
+            ...currentCoursGoals,
+            { text: enteredHoalText, id: Math.random().toString() },
+        ]);
     }
 
-    function addGoalHandler() {
-        setCourseGoals((currentCoursGoals) => [...currentCoursGoals, { text: enteredHoalText, id: Math.random().toString() }]);
+    function deleteGoalHandler(id) {
+        setCourseGoals((currentCoursGoals) => {
+            return currentCoursGoals.filter((goal) => goal.id !== id);
+        });
     }
 
     return (
         <View style={styles.appContainer}>
-            <View style={styles.inputContainer}>
-                <TextInput style={styles.textInput} placeholder='Your course hoal!' onChangeText={goalInputHandler} />
-                <Button title='Add Goal' onPress={addGoalHandler} />
-            </View>
+            <GoalInput onAddGoal={addGoalHandler} />
             <View style={styles.goalsContainer}>
                 <FlatList
                     data={courseGoals}
                     renderItem={(itemData) => {
                         return (
-                            <View style={styles.goalItem}>
-                                <Text style={styles.goalText}>{itemData.item.text}</Text>
-                            </View>
+                            <GoalItem
+                                text={itemData.item.text}
+                                id={itemData.item.id}
+                                onDeleteItem={deleteGoalHandler}
+                            />
                         );
                     }}
                     keyExtractor={(item, index) => {
